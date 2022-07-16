@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "145130519353",
+    "project_id": "fir-mvvm-91c42",
+    "storage_bucket": "fir-mvvm-91c42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145130519353:android:35c3e884d6d383a03d06e8",
+        "android_client_info": {
+          "package_name": "com.jetsada.firebasemvvmapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145130519353-nicis0fc08v72j2k78j6bq6ovpq1o8j0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jetsada.firebasemvvmapplication",
+            "certificate_hash": "272f080536223bbfc38f51b2b5c4d9991fe18a8f"
+          }
+        },
+        {
+          "client_id": "145130519353-jhb89h69567ncf986j64m759j3okvpau.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuvJ3-IrDYGaSJTCDIy8y-WYtSLr55ebs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145130519353-jhb89h69567ncf986j64m759j3okvpau.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
