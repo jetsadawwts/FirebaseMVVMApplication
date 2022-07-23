@@ -5,7 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.jetsada.firebasemvvmapplication.databinding.ItemNoteListLayoutBinding
 import com.jetsada.firebasemvvmapplication.model.Note
-
+import com.jetsada.firebasemvvmapplication.util.addChip
+import com.jetsada.firebasemvvmapplication.util.hide
+import java.text.SimpleDateFormat
 
 class NoteListAdapter(
     val onItemClicked: (Int, Note) -> Unit,
@@ -13,6 +15,7 @@ class NoteListAdapter(
     val onDeleteClicked: (Int,Note) -> Unit
 ) : RecyclerView.Adapter<NoteListAdapter.MyViewHolder>() {
 
+    val sdf = SimpleDateFormat("dd MMM yyyy")
     private var list: MutableList<Note> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -41,11 +44,29 @@ class NoteListAdapter(
 
     inner class MyViewHolder(val binding: ItemNoteListLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Note){
-            binding.noteIdValue.text = item.id
-            binding.msg.text = item.text
-            binding.edit.setOnClickListener { onEditClicked.invoke(adapterPosition, item) }
-            binding.delete.setOnClickListener { onDeleteClicked.invoke(adapterPosition, item) }
-            binding.itemLayout.setOnClickListener { onItemClicked.invoke(adapterPosition, item) }
+            binding.title.setText(item.title)
+            binding.date.setText(sdf.format(item.date))
+            binding.tags.apply {
+                if (item.tags.isNullOrEmpty()){
+                    hide()
+                }else {
+                    removeAllViews()
+                    if (item.tags.size > 2) {
+                        item.tags.subList(0, 2).forEach { tag -> addChip(tag) }
+                        addChip("+${item.tags.size - 2}")
+                    } else {
+                        item.tags.forEach { tag -> addChip(tag) }
+                    }
+                }
+            }
+            binding.desc.apply {
+                if (item.description.length > 120){
+                    text = "${item.description.substring(0,120)}..."
+                }else{
+                    text = item.description
+                }
+            }
+            binding.itemLayout.setOnClickListener { onItemClicked.invoke(adapterPosition,item) }
         }
     }
 }

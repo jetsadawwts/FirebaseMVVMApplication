@@ -6,6 +6,7 @@ import com.jetsada.firebasemvvmapplication.util.UiState
 interface NoteRepository {
 //    fun getNotes(): UiState<List<Note>>
     fun getNotes(result: (UiState<List<Note>>) -> Unit)
-    fun addNotes(note: Note, result: (UiState<String>) -> Unit)
-    fun updateNotes(note: Note, result: (UiState<String>) -> Unit)
+    fun addNote(note: Note, result: (UiState<Pair<Note,String>>) -> Unit)
+    fun updateNote(note: Note, result: (UiState<String>) -> Unit)
+    fun deleteNote(note: Note, result: (UiState<String>) -> Unit)
 }

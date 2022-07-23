@@ -1,8 +1,9 @@
 package com.jetsada.firebasemvvmapplication.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.Query
 import com.jetsada.firebasemvvmapplication.model.Note
+import com.jetsada.firebasemvvmapplication.util.Constants.Companion.DATE
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.NOTE
 import com.jetsada.firebasemvvmapplication.util.UiState
 import javax.inject.Inject
@@ -10,9 +11,10 @@ import javax.inject.Inject
 class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore): NoteRepository {
 
     override fun getNotes(result: (UiState<List<Note>>) -> Unit) {
-       fireStorage.collection(NOTE)
-           .get()
-           .addOnSuccessListener {
+        fireStorage.collection(NOTE)
+            .orderBy(DATE, Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener {
                 val notes = arrayListOf<Note>()
                 for (document in it) {
                     val note = document.toObject(Note::class.java)
@@ -20,25 +22,6 @@ class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore)
                 }
                 result.invoke(
                     UiState.Success(notes)
-                )
-           }
-           .addOnFailureListener {
-                result.invoke(
-                    UiState.Failure(it.localizedMessage)
-                )
-           }
-}
-
-    override fun addNotes(note: Note, result: (UiState<String>) -> Unit) {
-//        fireStorage.collection(NOTE)
-//            .add(note)
-          val document = fireStorage.collection(NOTE).document()
-              note.id = document.id
-          document.set(note)
-            .addOnSuccessListener {
-                result.invoke(
-//                    UiState.Success(it.id)
-                    UiState.Success("Note has been created successfully")
                 )
             }
             .addOnFailureListener {
@@ -50,9 +33,29 @@ class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore)
             }
     }
 
-    override fun updateNotes(note: Note, result: (UiState<String>) -> Unit) {
+    override fun addNote(note: Note, result: (UiState<Pair<Note,String>>) -> Unit) {
+        val document = fireStorage.collection(NOTE).document()
+        note.id = document.id
+        document
+            .set(note)
+            .addOnSuccessListener {
+                result.invoke(
+                    UiState.Success(Pair(note,"Note has been created successfully"))
+                )
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure(
+                        it.localizedMessage
+                    )
+                )
+            }
+    }
+
+    override fun updateNote(note: Note, result: (UiState<String>) -> Unit) {
         val document = fireStorage.collection(NOTE).document(note.id)
-        document.set(note)
+        document
+            .set(note)
             .addOnSuccessListener {
                 result.invoke(
                     UiState.Success("Note has been update successfully")
@@ -64,6 +67,17 @@ class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore)
                         it.localizedMessage
                     )
                 )
+            }
+    }
+
+    override fun deleteNote(note: Note, result: (UiState<String>) -> Unit) {
+        fireStorage.collection(NOTE).document(note.id)
+            .delete()
+            .addOnSuccessListener {
+                result.invoke(UiState.Success("Note successfully deleted!"))
+            }
+            .addOnFailureListener { e ->
+                result.invoke(UiState.Failure(e.message))
             }
     }
 

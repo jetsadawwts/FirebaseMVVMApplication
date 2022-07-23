@@ -3,12 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/someo/.gradle/caches/transforms-3/e0a6b67de530c2f07af6b1c2f122b850/transformed/material-1.6.1/res/drawable/ic_mtrl_chip_close_circle.xml" value="0.1735" />
         <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/font/font.xml" value="0.14583333333333334" />
         <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/activity_code.xml" value="0.22509057971014493" />
         <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/activity_main.xml" value="0.152" />
+        <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/add_tag_dialog.xml" value="0.23385416666666667" />
+        <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/item_chip.xml" value="0.23385416666666667" />
+        <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/item_image_note_detail.xml" value="0.23385416666666667" />
         <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/item_note_layout.xml" value="0.23489583333333333" />
         <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/item_note_list_layout.xml" value="0.264" />
-        <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/note_detail_fragment.xml" value="0.22509057971014493" />
+        <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/note_detail_fragment.xml" value="0.2" />
         <entry key="..\:/Users/someo/AndroidStudioProjects/FirebaseMVVMApplication/app/src/main/res/layout/note_list_fragment.xml" value="0.22509057971014493" />
       </map>
     </option>

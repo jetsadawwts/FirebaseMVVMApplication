@@ -11,8 +11,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.jetsada.firebasemvvmapplication.R
 import com.jetsada.firebasemvvmapplication.databinding.NoteListFragmentBinding
+import com.jetsada.firebasemvvmapplication.model.Note
 import com.jetsada.firebasemvvmapplication.util.UiState
 import com.jetsada.firebasemvvmapplication.util.hide
 import com.jetsada.firebasemvvmapplication.util.show
@@ -30,24 +33,25 @@ class NoteListFragment : Fragment() {
     lateinit var binding: NoteListFragmentBinding
     private lateinit var viewModel: NoteViewModel
     val noteViewModel: NoteViewModel by viewModels()
+    var deletePosition: Int = -1
+    var list: MutableList<Note> = arrayListOf()
     val adapter by lazy {
         NoteListAdapter(
             onItemClicked = { pos, item ->
-                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply{
+                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply {
                     putString("type", "view")
                     putParcelable("note", item)
                 })
-            },
-            onEditClicked = { pos, item ->
-                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply{
+            }
+            ,onEditClicked = { pos, item ->
+                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply {
                     putString("type", "edit")
                     putParcelable("note", item)
                 })
             },
             onDeleteClicked = { pos, item ->
-                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply{
-                    putString("type", "delete")
-                })
+                deletePosition = pos
+                viewModel.deleteNote(item)
             }
         )
     }
@@ -59,7 +63,11 @@ class NoteListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val staggeredGridLayoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+        binding.recyclerView.layoutManager = staggeredGridLayoutManager
         binding.recyclerView.adapter = adapter
+//        binding.recyclerView.itemAnimator = null
+
         binding.button.setOnClickListener {
             findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply {
                 putString("type", "create")
@@ -67,6 +75,22 @@ class NoteListFragment : Fragment() {
         }
         viewModel.getNotes()
         viewModel.note.observe(viewLifecycleOwner, Observer { state ->
+//            when {
+//                state.isLoading -> {
+//                  Log.e(TAG, state.isLoading.toString())
+//                  binding.progressBar.show()
+//                }
+//                state.error.isNotBlank() -> {
+//                  binding.progressBar.hide()
+//                  toast(state.error)
+//                }
+//                state.NoteList.isNotEmpty() -> {
+//                  binding.recyclerView.visibility = View.VISIBLE
+//                  binding.progressBar.hide()
+//                  adapter.updateList(state.NoteList as ArrayList<Note>)
+//                }
+//            }
+
           when(state) {
               is UiState.Loading -> {
                   Log.e(TAG, "Loading")
@@ -81,13 +105,36 @@ class NoteListFragment : Fragment() {
 
               is UiState.Success -> {
                   binding.progressBar.hide()
-                  adapter.updateList(state.data.toMutableList())
+                  list = state.data.toMutableList()
+                  adapter.updateList(list)
 //                  state.data.forEach {
 //                      Log.d(TAG, it.toString())
 //                  }
               }
           }
         })
+
+        viewModel.deleteNote.observe(viewLifecycleOwner) { state ->
+            when(state){
+                is UiState.Loading -> {
+                    binding.progressBar.show()
+                }
+                is UiState.Failure -> {
+                    binding.progressBar.hide()
+                    toast(state.error)
+                }
+                is UiState.Success -> {
+                    binding.progressBar.hide()
+                    toast(state.data)
+                    if(deletePosition != -1) {
+                        list.removeAt(deletePosition)
+                        adapter.updateList(list)
+                        deletePosition = -1
+                    }
+                }
+            }
+
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
