@@ -3,8 +3,8 @@ package com.jetsada.firebasemvvmapplication.ui.note
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jetsada.firebasemvvmapplication.data.repository.NoteRepository
-import com.jetsada.firebasemvvmapplication.model.Note
+import com.jetsada.firebasemvvmapplication.data.repository.note.NoteRepository
+import com.jetsada.firebasemvvmapplication.data.model.Note
 import com.jetsada.firebasemvvmapplication.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

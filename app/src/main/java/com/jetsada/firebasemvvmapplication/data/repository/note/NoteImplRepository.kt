@@ -1,8 +1,8 @@
-package com.jetsada.firebasemvvmapplication.data.repository
+package com.jetsada.firebasemvvmapplication.data.repository.note
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.jetsada.firebasemvvmapplication.model.Note
+import com.jetsada.firebasemvvmapplication.data.model.Note
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.DATE
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.NOTE
 import com.jetsada.firebasemvvmapplication.util.UiState

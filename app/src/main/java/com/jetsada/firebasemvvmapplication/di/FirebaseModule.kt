@@ -1,5 +1,6 @@
 package com.jetsada.firebasemvvmapplication.di
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -13,8 +14,14 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseFirestoreInstance(): FirebaseFirestore{
+    fun provideFirebaseFirestoreInstance(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuthInstance(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
     }
 
 }

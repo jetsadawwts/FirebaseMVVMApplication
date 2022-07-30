@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.jetsada.firebasemvvmapplication.databinding.ItemNoteListLayoutBinding
-import com.jetsada.firebasemvvmapplication.model.Note
+import com.jetsada.firebasemvvmapplication.data.model.Note
 import com.jetsada.firebasemvvmapplication.util.addChip
 import com.jetsada.firebasemvvmapplication.util.hide
 import java.text.SimpleDateFormat

@@ -2,7 +2,6 @@ package com.jetsada.firebasemvvmapplication.ui.note
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,11 +10,9 @@ import android.widget.EditText
 import androidx.core.widget.doAfterTextChanged
 import com.jetsada.firebasemvvmapplication.R
 import com.jetsada.firebasemvvmapplication.databinding.NoteDetailFragmentBinding
-import com.jetsada.firebasemvvmapplication.model.Note
+import com.jetsada.firebasemvvmapplication.data.model.Note
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.jetsada.firebasemvvmapplication.util.*
 import java.text.SimpleDateFormat

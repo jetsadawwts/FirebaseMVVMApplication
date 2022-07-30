@@ -1,4 +1,4 @@
-package com.jetsada.firebasemvvmapplication.model
+package com.jetsada.firebasemvvmapplication.data.model
 
 import android.os.Parcelable
 import com.google.firebase.firestore.ServerTimestamp

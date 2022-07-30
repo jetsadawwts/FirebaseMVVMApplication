@@ -1,6 +1,6 @@
-package com.jetsada.firebasemvvmapplication.data.repository
+package com.jetsada.firebasemvvmapplication.data.repository.note
 
-import com.jetsada.firebasemvvmapplication.model.Note
+import com.jetsada.firebasemvvmapplication.data.model.Note
 import com.jetsada.firebasemvvmapplication.util.UiState
 
 interface NoteRepository {

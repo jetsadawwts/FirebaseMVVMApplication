@@ -3,7 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/app_navigation"
-    app:startDestination="@id/noteListFragment">
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.jetsada.firebasemvvmapplication.ui.auth.RegisterFragment"
+        android:label="register"
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_noteListFragment"
+            app:destination="@id/noteListFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/noteListFragment"
@@ -14,9 +24,23 @@
             android:id="@+id/action_noteListFragment_to_noteDetailFragment"
             app:destination="@id/noteDetailFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/noteDetailFragment"
         android:name="com.jetsada.firebasemvvmapplication.ui.note.NoteDetailFragment"
         android:label="note_detail_fragment"
         tools:layout="@layout/note_detail_fragment" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.jetsada.firebasemvvmapplication.ui.auth.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_noteListFragment"
+            app:destination="@id/noteListFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
 </navigation>

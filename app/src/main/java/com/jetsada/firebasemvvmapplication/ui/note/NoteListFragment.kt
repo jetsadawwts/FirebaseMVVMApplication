@@ -1,6 +1,5 @@
 package com.jetsada.firebasemvvmapplication.ui.note
 
-import android.app.ProgressDialog.show
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.jetsada.firebasemvvmapplication.R
 import com.jetsada.firebasemvvmapplication.databinding.NoteListFragmentBinding
-import com.jetsada.firebasemvvmapplication.model.Note
+import com.jetsada.firebasemvvmapplication.data.model.Note
 import com.jetsada.firebasemvvmapplication.util.UiState
 import com.jetsada.firebasemvvmapplication.util.hide
 import com.jetsada.firebasemvvmapplication.util.show
