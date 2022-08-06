@@ -1,27 +1,39 @@
 package com.jetsada.firebasemvvmapplication.data.repository.auth
 
+import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.gson.Gson
 import com.jetsada.firebasemvvmapplication.data.model.User
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.USER
+import com.jetsada.firebasemvvmapplication.util.Constants.Companion.USER_SESSION
 import com.jetsada.firebasemvvmapplication.util.UiState
 import javax.inject.Inject
 
-class AuthImplRepository @Inject constructor(val fireStorage: FirebaseFirestore, val fireAuth: FirebaseAuth): AuthRepository {
+class AuthImplRepository @Inject constructor(val fireStorage: FirebaseFirestore, val fireAuth: FirebaseAuth, val sharedPreferences: SharedPreferences, val gson: Gson): AuthRepository {
 
     override fun registerUser(email: String, password: String, user: User, result: (UiState<String>) -> Unit) {
         fireAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if(it.isSuccessful) {
+                    user.id = it.result.user?.uid ?: ""
                     updateUserInfo(user) { state ->
                         when(state) {
                             is UiState.Success -> {
-                                result.invoke(
-                                    UiState.Success("User register successfully")
-                                )
+                                storeSession(id = it.result.user?.uid ?: "") {
+                                    if(it == null) {
+                                        result.invoke(UiState.Failure("User register successfully but session failed to store"))
+                                    } else {
+                                        result.invoke(
+                                            UiState.Success("User register successfully")
+                                        )
+                                    }
+
+                                }
                             }
                             is UiState.Failure -> {
                                 result.invoke(
@@ -54,8 +66,7 @@ class AuthImplRepository @Inject constructor(val fireStorage: FirebaseFirestore,
     }
 
     override fun updateUserInfo(user: User, result: (UiState<String>) -> Unit) {
-        val document = fireStorage.collection(USER).document()
-        user.id = document.id
+        val document = fireStorage.collection(USER).document(user.id)
         document
             .set(user)
             .addOnSuccessListener {
@@ -76,7 +87,13 @@ class AuthImplRepository @Inject constructor(val fireStorage: FirebaseFirestore,
         fireAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    result.invoke(UiState.Success("Login successfully!"))
+                    storeSession(id = task.result.user?.uid ?: "") {
+                        if(it == null) {
+                            result.invoke(UiState.Failure("Failed to store local session"))
+                        } else {
+                            result.invoke(UiState.Success("Login successfully!"))
+                        }
+                    }
                 }
             }
             .addOnFailureListener {
@@ -84,7 +101,54 @@ class AuthImplRepository @Inject constructor(val fireStorage: FirebaseFirestore,
             }
     }
 
-    override fun forgotPassword(user: User, result: (UiState<String>) -> Unit) {
+    override fun forgotPassword(email: String, result: (UiState<String>) -> Unit) {
+        fireAuth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    result.invoke(UiState.Success("Email has been sent"))
 
+                } else {
+                    result.invoke(UiState.Failure(task.exception?.message))
+                }
+            }
+            .addOnFailureListener {
+                result.invoke(UiState.Failure("Authentication failed, Check email"))
+            }
     }
+
+    override fun logout(result: () -> Unit) {
+        fireAuth.signOut()
+        sharedPreferences.edit().putString(USER_SESSION, null).apply()
+        result.invoke()
+    }
+
+    override fun storeSession(id: String, result: (User?) -> Unit) {
+        fireStorage.collection(USER).document(id)
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful) {
+                    val user = it.result.toObject(User::class.java)
+                    sharedPreferences.edit().putString(USER_SESSION, gson.toJson(user)).apply()
+                    result.invoke(user)
+                } else {
+                    result.invoke(null)
+                }
+            }
+            .addOnFailureListener {
+                result.invoke(null)
+            }
+    }
+
+    override fun getSession(result: (User?) -> Unit) {
+        val user_str = sharedPreferences.getString(USER_SESSION, null)
+        if(user_str == null) {
+            result.invoke(null)
+        } else {
+            val user = gson.fromJson(user_str, User::class.java)
+            result.invoke(user)
+        }
+    }
+
+
+
 }

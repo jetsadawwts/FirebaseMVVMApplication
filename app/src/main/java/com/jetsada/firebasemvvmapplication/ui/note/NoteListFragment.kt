@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.jetsada.firebasemvvmapplication.R
 import com.jetsada.firebasemvvmapplication.databinding.NoteListFragmentBinding
 import com.jetsada.firebasemvvmapplication.data.model.Note
+import com.jetsada.firebasemvvmapplication.ui.auth.AuthViewModel
 import com.jetsada.firebasemvvmapplication.util.UiState
 import com.jetsada.firebasemvvmapplication.util.hide
 import com.jetsada.firebasemvvmapplication.util.show
@@ -32,6 +33,7 @@ class NoteListFragment : Fragment() {
     lateinit var binding: NoteListFragmentBinding
     private lateinit var viewModel: NoteViewModel
     val noteViewModel: NoteViewModel by viewModels()
+    val authViewModel: AuthViewModel by viewModels()
     var deletePosition: Int = -1
     var list: MutableList<Note> = arrayListOf()
     val adapter by lazy {
@@ -62,6 +64,7 @@ class NoteListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        observe()
         val staggeredGridLayoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
         binding.recyclerView.layoutManager = staggeredGridLayoutManager
         binding.recyclerView.adapter = adapter
@@ -72,7 +75,16 @@ class NoteListFragment : Fragment() {
                 putString("type", "create")
             })
         }
+
+        binding.logout.setOnClickListener {
+            authViewModel.logout {
+                findNavController().navigate(R.id.action_noteListFragment_to_loginFragment)
+            }
+        }
         viewModel.getNotes()
+    }
+
+    private fun observe() {
         viewModel.note.observe(viewLifecycleOwner, Observer { state ->
 //            when {
 //                state.isLoading -> {
@@ -90,27 +102,27 @@ class NoteListFragment : Fragment() {
 //                }
 //            }
 
-          when(state) {
-              is UiState.Loading -> {
-                  Log.e(TAG, "Loading")
-                  binding.progressBar.show()
-              }
+            when(state) {
+                is UiState.Loading -> {
+                    Log.e(TAG, "Loading")
+                    binding.progressBar.show()
+                }
 
-              is UiState.Failure -> {
-                  Log.e(TAG, state.error.toString())
-                  binding.progressBar.hide()
-                  toast(state.error)
-              }
+                is UiState.Failure -> {
+                    Log.e(TAG, state.error.toString())
+                    binding.progressBar.hide()
+                    toast(state.error)
+                }
 
-              is UiState.Success -> {
-                  binding.progressBar.hide()
-                  list = state.data.toMutableList()
-                  adapter.updateList(list)
+                is UiState.Success -> {
+                    binding.progressBar.hide()
+                    list = state.data.toMutableList()
+                    adapter.updateList(list)
 //                  state.data.forEach {
 //                      Log.d(TAG, it.toString())
 //                  }
-              }
-          }
+                }
+            }
         })
 
         viewModel.deleteNote.observe(viewLifecycleOwner) { state ->

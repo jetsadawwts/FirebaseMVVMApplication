@@ -49,7 +49,7 @@ class LoginFragment : Fragment() {
         }
 
         binding.forgotPassLabel.setOnClickListener {
-
+            findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
         }
 
         binding.registerLabel.setOnClickListener {
@@ -103,6 +103,18 @@ class LoginFragment : Fragment() {
         }
         return isValid
     }
+
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.gerSession { user ->
+            if(user != null) {
+                findNavController().navigate(R.id.action_loginFragment_to_noteListFragment)
+            }
+        }
+    }
+
+
 
 
 

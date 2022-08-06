@@ -1,7 +1,9 @@
 package com.jetsada.firebasemvvmapplication.di
 
+import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
 import com.jetsada.firebasemvvmapplication.data.repository.auth.AuthImplRepository
 import com.jetsada.firebasemvvmapplication.data.repository.auth.AuthRepository
 import com.jetsada.firebasemvvmapplication.data.repository.note.NoteImplRepository
@@ -25,7 +27,7 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(fireStore: FirebaseFirestore, fireAuth: FirebaseAuth): AuthRepository {
-        return AuthImplRepository(fireStore, fireAuth)
+    fun provideAuthRepository(fireStore: FirebaseFirestore, fireAuth: FirebaseAuth, sharedPreferences: SharedPreferences, gson: Gson): AuthRepository {
+        return AuthImplRepository(fireStore, fireAuth, sharedPreferences, gson)
     }
 }
