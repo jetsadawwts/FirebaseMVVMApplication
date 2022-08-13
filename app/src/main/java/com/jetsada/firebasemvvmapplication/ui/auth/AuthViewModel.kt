@@ -54,6 +54,4 @@ class AuthViewModel @Inject constructor(val repository: AuthRepository) : ViewMo
     fun gerSession(result: (User?) -> Unit) {
         repository.getSession(result)
     }
-
-
 }

@@ -1,17 +1,26 @@
 package com.jetsada.firebasemvvmapplication.data.repository.note
 
+import android.net.Uri
+import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.StorageReference
 import com.jetsada.firebasemvvmapplication.data.model.Note
+import com.jetsada.firebasemvvmapplication.data.model.User
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.DATE
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.NOTE
+import com.jetsada.firebasemvvmapplication.util.Constants.Companion.USER_ID
 import com.jetsada.firebasemvvmapplication.util.UiState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore): NoteRepository {
+class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore, val storageReference: StorageReference): NoteRepository {
 
-    override fun getNotes(result: (UiState<List<Note>>) -> Unit) {
+    override fun getNotes(user: User?, result: (UiState<List<Note>>) -> Unit) {
         fireStorage.collection(NOTE)
+            .whereEqualTo(USER_ID, user?.id)
             .orderBy(DATE, Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener {
@@ -79,6 +88,24 @@ class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore)
             .addOnFailureListener { e ->
                 result.invoke(UiState.Failure(e.message))
             }
+    }
+
+    override suspend fun uploadSingleFile(fileUri: Uri, result: (UiState<Uri>) -> Unit) {
+        try {
+            val uri: Uri = withContext(Dispatchers.IO) {
+                storageReference
+                    .putFile(fileUri)
+                    .await()
+                    .storage
+                    .downloadUrl
+                    .await()
+            }
+            result.invoke(UiState.Success(uri))
+        } catch (e: FirebaseException){
+            result.invoke(UiState.Failure(e.message))
+        }catch (e: Exception){
+            result.invoke(UiState.Failure(e.message))
+        }
     }
 
 //    override fun getNotes(): UiState<List<Note>> {

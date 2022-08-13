@@ -1,22 +1,30 @@
 package com.jetsada.firebasemvvmapplication.ui.note
 
+import android.app.Activity
+import android.net.Uri
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.viewModels
 import com.jetsada.firebasemvvmapplication.R
 import com.jetsada.firebasemvvmapplication.databinding.NoteDetailFragmentBinding
 import com.jetsada.firebasemvvmapplication.data.model.Note
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
+import com.jetsada.firebasemvvmapplication.ui.auth.AuthViewModel
 import com.jetsada.firebasemvvmapplication.util.*
 import java.text.SimpleDateFormat
-
+import androidx.activity.result.ActivityResult
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.dhaval2404.imagepicker.ImagePicker
 import java.util.*
 
 @AndroidEntryPoint
@@ -28,9 +36,33 @@ class NoteDetailFragment : Fragment() {
     val TAG: String = "NoteDetailFragment"
     lateinit var binding: NoteDetailFragmentBinding
     private lateinit var viewModel: NoteViewModel
+    val authViewModel: AuthViewModel by viewModels()
     var isEdit = false
     var objNote: Note? = null
     var tagsList: MutableList<String> = arrayListOf()
+    var imageUris: MutableList<Uri> = arrayListOf()
+    val adapter by lazy {
+        ImageListingAdapter(
+            onCancelClicked = { pos, item -> onRemoveImage(pos, item) }
+        )
+    }
+
+    private val startForProfileImageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        val resultCode = result.resultCode
+        val data = result.data
+        if (resultCode == Activity.RESULT_OK) {
+            val fileUri = data?.data!!
+            imageUris.add(fileUri)
+            adapter.updateList(imageUris)
+            binding.progressBar.hide()
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+            binding.progressBar.hide()
+            toast(ImagePicker.getError(data))
+        } else {
+            binding.progressBar.hide()
+            Log.e(TAG,"Task Cancelled")
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         if (this::binding.isInitialized){
@@ -132,6 +164,19 @@ class NoteDetailFragment : Fragment() {
             binding.delete.hide()
             isMakeEnableUI(true)
         }
+        binding.images.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL,false)
+        binding.images.adapter = adapter
+        binding.images.itemAnimator = null
+        binding.addImageLl.setOnClickListener {
+            binding.progressBar.show()
+            ImagePicker.with(this)
+                //.crop()
+                .compress(1024)
+                .galleryOnly()
+                .createIntent { intent ->
+                    startForProfileImageResult.launch(intent)
+                }
+        }
         binding.back.setOnClickListener {
             findNavController().navigateUp()
         }
@@ -154,12 +199,8 @@ class NoteDetailFragment : Fragment() {
             binding.title.requestFocus()
         }
         binding.done.setOnClickListener {
-            if (validation()) {
-                if (objNote == null) {
-                    viewModel.addNote(getNote())
-                } else {
-                    viewModel.updateNote(getNote())
-                }
+            if(validation()) {
+                onDonePressed()
             }
         }
         binding.title.doAfterTextChanged {
@@ -170,6 +211,10 @@ class NoteDetailFragment : Fragment() {
             binding.done.show()
             binding.edit.hide()
         }
+    }
+
+    private fun onRemoveImage(pos: Int, item: Uri) {
+        adapter.removeItem(pos)
     }
 
     private fun showAddTagDialog(){
@@ -247,8 +292,51 @@ class NoteDetailFragment : Fragment() {
             title = binding.title.text.toString(),
             description = binding.description.text.toString(),
             tags = tagsList,
+            images = getImageUrls(),
             date = Date()
-        )
+        ).apply {
+            authViewModel.gerSession {
+                this.user_id = it?.id ?: ""
+            }
+        }
+    }
+
+    private fun getImageUrls(): List<String> {
+        if(imageUris.isNotEmpty()) {
+            return imageUris.map { it.toString() }
+        } else {
+            return objNote?.images ?: arrayListOf()
+        }
+    }
+
+    private fun onDonePressed() {
+        if(imageUris.isNotEmpty()) {
+            viewModel.uploadSingleFile(imageUris.first()) { state ->
+                when(state) {
+                    is UiState.Loading -> {
+                        binding.progressBar.show()
+                    }
+                    is UiState.Failure -> {
+                        binding.progressBar.hide()
+                        toast(state.error)
+                    }
+                    is UiState.Success -> {
+                        binding.progressBar.hide()
+                        if (objNote == null) {
+                            viewModel.addNote(getNote())
+                        } else {
+                            viewModel.updateNote(getNote())
+                        }
+                    }
+                }
+            }
+        } else {
+                if (objNote == null) {
+                    viewModel.addNote(getNote())
+                } else {
+                    viewModel.updateNote(getNote())
+                }
+        }
     }
 
 

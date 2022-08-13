@@ -1,12 +1,16 @@
 package com.jetsada.firebasemvvmapplication.ui.note
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jetsada.firebasemvvmapplication.data.repository.note.NoteRepository
 import com.jetsada.firebasemvvmapplication.data.model.Note
+import com.jetsada.firebasemvvmapplication.data.model.User
 import com.jetsada.firebasemvvmapplication.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,9 +35,9 @@ class NoteViewModel @Inject constructor(private val repository: NoteRepository):
     val deleteNote: LiveData<UiState<String>>
         get() = _deleteNote
 
-    fun getNotes() {
+    fun getNotes(user: User?) {
         _notes.value = UiState.Loading
-        repository.getNotes { _notes.value = it }
+        repository.getNotes(user) { _notes.value = it }
     }
 
     fun addNote(note: Note){
@@ -50,6 +54,16 @@ class NoteViewModel @Inject constructor(private val repository: NoteRepository):
         _deleteNote.value = UiState.Loading
         repository.deleteNote(note) { _deleteNote.value = it }
     }
+
+    fun uploadSingleFile(fileUri: Uri, result: (UiState<Uri>) -> Unit) {
+        result.invoke(UiState.Loading)
+        viewModelScope.launch {
+            repository.uploadSingleFile(fileUri, result)
+        }
+    }
+
+
+
 
 //    fun getNotes() {
 //            _note.value = ViewState(isLoading = true)

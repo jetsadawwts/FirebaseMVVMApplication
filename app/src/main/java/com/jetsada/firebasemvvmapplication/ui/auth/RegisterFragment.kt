@@ -2,6 +2,7 @@ package com.jetsada.firebasemvvmapplication.ui.auth
 
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -64,6 +65,7 @@ class RegisterFragment : Fragment() {
                         binding.registerBtn.text = "Register"
                         binding.registerProgress.hide()
                         toast(it.error)
+                        Log.d(TAG, it.error.toString())
                     }
                     is UiState.Success -> {
                         binding.registerBtn.text = "Register"
