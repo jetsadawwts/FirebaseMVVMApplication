@@ -11,5 +11,6 @@ interface NoteRepository {
     fun addNote(note: Note, result: (UiState<Pair<Note,String>>) -> Unit)
     fun updateNote(note: Note, result: (UiState<String>) -> Unit)
     fun deleteNote(note: Note, result: (UiState<String>) -> Unit)
-    suspend fun  uploadSingleFile(fileUri: Uri, result: (UiState<Uri>) -> Unit)
+    suspend fun uploadSingleFile(fileUri: Uri, result: (UiState<Uri>) -> Unit)
+    suspend fun updateMultiFile(fileUri: List<Uri>, result: (UiState<List<Uri>>) -> Unit)
 }

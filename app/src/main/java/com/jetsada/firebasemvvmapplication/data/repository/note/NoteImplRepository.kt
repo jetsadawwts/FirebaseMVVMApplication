@@ -9,9 +9,12 @@ import com.jetsada.firebasemvvmapplication.data.model.Note
 import com.jetsada.firebasemvvmapplication.data.model.User
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.DATE
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.NOTE
+import com.jetsada.firebasemvvmapplication.util.Constants.Companion.NOTE_IMAGES
 import com.jetsada.firebasemvvmapplication.util.Constants.Companion.USER_ID
 import com.jetsada.firebasemvvmapplication.util.UiState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -99,6 +102,30 @@ class NoteImplRepository @Inject constructor(val fireStorage: FirebaseFirestore,
                     .storage
                     .downloadUrl
                     .await()
+            }
+            result.invoke(UiState.Success(uri))
+        } catch (e: FirebaseException){
+            result.invoke(UiState.Failure(e.message))
+        }catch (e: Exception){
+            result.invoke(UiState.Failure(e.message))
+        }
+    }
+
+    override suspend fun updateMultiFile(fileUri: List<Uri>, result: (UiState<List<Uri>>) -> Unit) {
+        try {
+            val uri: List<Uri> = withContext(Dispatchers.IO) {
+                // 1, 2 ,3, 4
+                // 4 asyn block
+                fileUri.map { image ->
+                    async {
+                        storageReference.child(NOTE_IMAGES).child(image.lastPathSegment ?: "${System.currentTimeMillis()}")
+                            .putFile(image)
+                            .await()
+                            .storage
+                            .downloadUrl
+                            .await()
+                    }
+                }.awaitAll()
             }
             result.invoke(UiState.Success(uri))
         } catch (e: FirebaseException){

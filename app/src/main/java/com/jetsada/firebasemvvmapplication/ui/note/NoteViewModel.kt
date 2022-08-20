@@ -62,6 +62,13 @@ class NoteViewModel @Inject constructor(private val repository: NoteRepository):
         }
     }
 
+    fun uploadMutipleFile(fileUri: List<Uri>, result: (UiState<List<Uri>>) -> Unit) {
+        result.invoke(UiState.Loading)
+        viewModelScope.launch {
+            repository.updateMultiFile(fileUri, result)
+        }
+    }
+
 
 
 
