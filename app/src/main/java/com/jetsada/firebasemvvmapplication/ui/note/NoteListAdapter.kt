@@ -11,8 +11,8 @@ import java.text.SimpleDateFormat
 
 class NoteListAdapter(
     val onItemClicked: (Int, Note) -> Unit,
-    val onEditClicked: (Int, Note) -> Unit,
-    val onDeleteClicked: (Int,Note) -> Unit
+//    val onEditClicked: (Int, Note) -> Unit,
+//    val onDeleteClicked: (Int,Note) -> Unit
 ) : RecyclerView.Adapter<NoteListAdapter.MyViewHolder>() {
 
     val sdf = SimpleDateFormat("dd MMM yyyy")

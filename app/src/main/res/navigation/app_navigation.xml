@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/app_navigation"
@@ -9,52 +10,38 @@
         android:id="@+id/registerFragment"
         android:name="com.jetsada.firebasemvvmapplication.ui.auth.RegisterFragment"
         android:label="register"
-        tools:layout="@layout/fragment_register" >
-        <action
-            android:id="@+id/action_registerFragment_to_noteListFragment"
-            app:destination="@id/noteListFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_register">
 
-    <fragment
-        android:id="@+id/noteListFragment"
-        android:name="com.jetsada.firebasemvvmapplication.ui.note.NoteListFragment"
-        android:label="note_list_fragment"
-        tools:layout="@layout/note_list_fragment" >
         <action
-            android:id="@+id/action_noteListFragment_to_noteDetailFragment"
-            app:destination="@id/noteDetailFragment" />
-        <action
-            android:id="@+id/action_noteListFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_registerFragment_to_home_navigation"
+            app:destination="@id/home_navigation" />
 
     </fragment>
 
-    <fragment
-        android:id="@+id/noteDetailFragment"
-        android:name="com.jetsada.firebasemvvmapplication.ui.note.NoteDetailFragment"
-        android:label="note_detail_fragment"
-        tools:layout="@layout/note_detail_fragment" />
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.jetsada.firebasemvvmapplication.ui.auth.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
-            android:id="@+id/action_loginFragment_to_noteListFragment"
-            app:destination="@id/noteListFragment" />
-        <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
         <action
             android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
             app:destination="@id/forgotPasswordFragment" />
+
+        <action
+            android:id="@+id/action_loginFragment_to_home_navigation"
+            app:destination="@id/home_navigation" />
+
     </fragment>
+
     <fragment
         android:id="@+id/forgotPasswordFragment"
         android:name="com.jetsada.firebasemvvmapplication.ui.auth.ForgotPasswordFragment"
         android:label="fragment_forgot_password"
         tools:layout="@layout/fragment_forgot_password" />
+
+    <include app:graph="@navigation/home_navigation" />
 
 </navigation>

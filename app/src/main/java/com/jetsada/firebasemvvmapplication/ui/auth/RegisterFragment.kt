@@ -71,7 +71,7 @@ class RegisterFragment : Fragment() {
                         binding.registerBtn.text = "Register"
                         binding.registerProgress.hide()
                         toast(it.data)
-                        findNavController().navigate(R.id.action_registerFragment_to_noteListFragment)
+                        findNavController().navigate(R.id.action_registerFragment_to_home_navigation)
                     }
                 }
             }

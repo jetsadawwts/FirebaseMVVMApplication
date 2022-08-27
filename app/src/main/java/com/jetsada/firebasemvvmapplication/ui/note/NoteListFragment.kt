@@ -22,44 +22,58 @@ import com.jetsada.firebasemvvmapplication.util.show
 import com.jetsada.firebasemvvmapplication.util.toast
 import dagger.hilt.android.AndroidEntryPoint
 
+
+private const val ARG_PARAM1 = "param1"
+
+
 @AndroidEntryPoint
 class NoteListFragment : Fragment() {
 
     companion object {
-        fun newInstance() = NoteListFragment()
+        @JvmStatic
+        fun newInstance(param1: String) =
+            NoteListFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                }
+            }
     }
 
     val TAG: String = "NoteListFragment"
+    var param1: String? = null
     lateinit var binding: NoteListFragmentBinding
-    private lateinit var viewModel: NoteViewModel
     val noteViewModel: NoteViewModel by viewModels()
     val authViewModel: AuthViewModel by viewModels()
-    var deletePosition: Int = -1
     var list: MutableList<Note> = arrayListOf()
     val adapter by lazy {
         NoteListAdapter(
             onItemClicked = { pos, item ->
-                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply {
+                findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment, Bundle().apply {
                     putString("type", "view")
                     putParcelable("note", item)
                 })
             }
-            ,onEditClicked = { pos, item ->
-                findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply {
-                    putString("type", "edit")
-                    putParcelable("note", item)
-                })
-            },
-            onDeleteClicked = { pos, item ->
-                deletePosition = pos
-                viewModel.deleteNote(item)
-            }
         )
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+        }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = NoteListFragmentBinding.inflate(layoutInflater)
-        return binding.root
+        if (this::binding.isInitialized){
+            return binding.root
+        }else {
+            binding = NoteListFragmentBinding.inflate(layoutInflater)
+            return binding.root
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,42 +82,17 @@ class NoteListFragment : Fragment() {
         val staggeredGridLayoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
         binding.recyclerView.layoutManager = staggeredGridLayoutManager
         binding.recyclerView.adapter = adapter
-//        binding.recyclerView.itemAnimator = null
-
         binding.button.setOnClickListener {
-            findNavController().navigate(R.id.action_noteListFragment_to_noteDetailFragment, Bundle().apply {
-                putString("type", "create")
-            })
+            findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment)
         }
 
-        binding.logout.setOnClickListener {
-            authViewModel.logout {
-                findNavController().navigate(R.id.action_noteListFragment_to_loginFragment)
-            }
-        }
         authViewModel.gerSession {
-            viewModel.getNotes(it)
+            noteViewModel.getNotes(it)
         }
     }
 
     private fun observe() {
-        viewModel.note.observe(viewLifecycleOwner, Observer { state ->
-//            when {
-//                state.isLoading -> {
-//                  Log.e(TAG, state.isLoading.toString())
-//                  binding.progressBar.show()
-//                }
-//                state.error.isNotBlank() -> {
-//                  binding.progressBar.hide()
-//                  toast(state.error)
-//                }
-//                state.NoteList.isNotEmpty() -> {
-//                  binding.recyclerView.visibility = View.VISIBLE
-//                  binding.progressBar.hide()
-//                  adapter.updateList(state.NoteList as ArrayList<Note>)
-//                }
-//            }
-
+        noteViewModel.note.observe(viewLifecycleOwner, Observer { state ->
             when(state) {
                 is UiState.Loading -> {
                     Log.e(TAG, "Loading")
@@ -120,45 +109,10 @@ class NoteListFragment : Fragment() {
                     binding.progressBar.hide()
                     list = state.data.toMutableList()
                     adapter.updateList(list)
-//                  state.data.forEach {
-//                      Log.d(TAG, it.toString())
-//                  }
                 }
             }
         })
-
-        viewModel.deleteNote.observe(viewLifecycleOwner) { state ->
-            when(state){
-                is UiState.Loading -> {
-                    binding.progressBar.show()
-                }
-                is UiState.Failure -> {
-                    binding.progressBar.hide()
-                    toast(state.error)
-                }
-                is UiState.Success -> {
-                    binding.progressBar.hide()
-                    toast(state.data)
-                    if(deletePosition != -1) {
-                        list.removeAt(deletePosition)
-                        adapter.updateList(list)
-                        deletePosition = -1
-                    }
-                }
-            }
-
-        }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-
-    }
 
 }
