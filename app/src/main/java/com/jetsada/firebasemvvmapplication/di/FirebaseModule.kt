@@ -1,6 +1,7 @@
 package com.jetsada.firebasemvvmapplication.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -31,6 +32,12 @@ object FirebaseModule {
     @Provides
     fun provideFirebaseStroageInstance(): StorageReference {
         return FirebaseStorage.getInstance().getReference(ROOT_DIRECTORY)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFirebaseRealTimeInstance(): FirebaseDatabase {
+        return FirebaseDatabase.getInstance()
     }
 
 }

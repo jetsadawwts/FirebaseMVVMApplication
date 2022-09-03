@@ -11,6 +11,7 @@ class Constants {
         const val USER_ID = "user_id"
         const val ROOT_DIRECTORY = "app"
         const val NOTE_IMAGES = "note"
+        const val TASK = "task"
     }
 }
 

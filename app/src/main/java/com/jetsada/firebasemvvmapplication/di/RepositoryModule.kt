@@ -2,6 +2,7 @@ package com.jetsada.firebasemvvmapplication.di
 
 import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
@@ -9,6 +10,8 @@ import com.jetsada.firebasemvvmapplication.data.repository.auth.AuthImplReposito
 import com.jetsada.firebasemvvmapplication.data.repository.auth.AuthRepository
 import com.jetsada.firebasemvvmapplication.data.repository.note.NoteImplRepository
 import com.jetsada.firebasemvvmapplication.data.repository.note.NoteRepository
+import com.jetsada.firebasemvvmapplication.data.repository.task.TaskImplRepository
+import com.jetsada.firebasemvvmapplication.data.repository.task.TaskRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,6 +33,13 @@ object RepositoryModule {
     @Singleton
     fun provideAuthRepository(fireStore: FirebaseFirestore, fireAuth: FirebaseAuth, sharedPreferences: SharedPreferences, gson: Gson): AuthRepository {
         return AuthImplRepository(fireStore, fireAuth, sharedPreferences, gson)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideTaskRepository(firebaseRealTime: FirebaseDatabase): TaskRepository {
+        return TaskImplRepository(firebaseRealTime)
     }
 
 }
